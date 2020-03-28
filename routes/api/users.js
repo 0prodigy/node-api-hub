@@ -23,14 +23,15 @@ router.get('/register', (req, res) => {
     })
 });
 
-// @route GET api/users/register
+// @route Post api/users/register
 // @desc register users 
 // @access  Public
 
 router.post('/register', (req, res) => {
-    const {error, isValid} = validateRegisterInput(req.body);
-    
-    if(!isValid){
+    const { error, isValid } = validateRegisterInput(req.body);
+
+    if (isValid) {
+        error.name = "Wromg ane"
         return res.status(400).json(error);
     }
 
@@ -60,12 +61,12 @@ router.post('/register', (req, res) => {
                         newUser.password = hash;
                         newUser.save()
                             .then(user => res.json(newUser))
-                            .catch(err => console.log(err))
+                            .catch(err => console.log("err"))
 
                     });
                 });
             }
-        });
+        }).catch(err => res.json(err));
 });
 
 // @route GET api/users/register
@@ -73,10 +74,10 @@ router.post('/register', (req, res) => {
 // @access  Public 
 
 router.post('/login', (req, res) => {
-    const {error, isValid} = validateLoginInput(req.body);
+    const { error, isValid } = validateLoginInput(req.body);
     // res.json({email: req.body.email,  password:req.body.password})
-    if(isValid){
-        return res.status(400).json({error: "invalid"});
+    if (isValid) {
+        return res.status(400).json({ error: "invalid" });
     }
     const email = req.body.email;
     const password = req.body.password;
@@ -87,35 +88,37 @@ router.post('/login', (req, res) => {
                 error.email = "Email Not Found"
                 return res.json(error);
                 console.log("email not found");
-                
+
             }
             //check  passowrd
             bcrypt.compare(password, user.password)
                 .then(isMatch => {
                     if (isMatch) {
                         //user Matched
-                        const payload = {id: user.id, name: user.name, avatar: user.avatar}
+                        const payload = { id: user.id, name: user.name, avatar: user.avatar }
 
-                        jwt.sign(payload, key.secretOrKey ,{expiresIn: 3400}, (err, token) =>{
+                        jwt.sign(payload, key.secretOrKey, { expiresIn: 3400 }, (err, token) => {
                             res.json({
                                 success: true,
                                 token: 'Bearer ' + token
                             })
                         })
                     } else {
-                        errors.password= "Wrong Password"
+                        errors.password = "Wrong Password"
                         return res.status(400).json(error);
                     }
-                }).catch(err => {console.log(err);
-                 res.json(err)});
+                }).catch(err => {
+                    console.log(err);
+                    res.json(err)
+                });
         });
-}); 
+});
 
 // @route GET api/users/current
 // @desc return current users 
 // @access  Private 
-router.get('/current', passport.authenticate('jwt', {session: false}), (req,res)=>{
-    res.json({msg:"success"})
+router.get('/current', passport.authenticate('jwt', { session: false }), (req, res) => {
+    res.json({ msg: "success" })
 })
 
 module.exports = router;
