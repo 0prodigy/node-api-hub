@@ -53,7 +53,7 @@ Give a ⭐️ if you like this project!
 
 ## Acknowledgments
 
-- Content inspired by the original youtube page.
+-  Practice for basic function to build a rest api with node js and mongo db
 
 ## 📝 License
 
